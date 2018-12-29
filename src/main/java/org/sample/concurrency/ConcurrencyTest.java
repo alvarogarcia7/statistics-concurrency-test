@@ -54,6 +54,10 @@ class AverageConcurrencyTest {
 
     private String addTransactionAndCalculateAvg(TransactionRepository repository) {
         repository.addTransaction(getRequest());
+        return avg(repository);
+    }
+
+    private String avg(TransactionRepository repository) {
         return repository.statisticsOfLast60Seconds().get("avg").orNull();
     }
 
@@ -71,13 +75,17 @@ class MaxConcurrencyTest {
     @Actor
     public void actor1(TransactionRepository repository, StringString_Result r) {
         repository.addTransaction(getRequest("1"));
-        r.r1 = repository.statisticsOfLast60Seconds().get("max").orNull();
+        r.r1 = max(repository);
     }
 
     @Actor
     public void actor2(TransactionRepository repository, StringString_Result r) {
         repository.addTransaction(getRequest("2"));
-        r.r2 = repository.statisticsOfLast60Seconds().get("max").orNull();
+        r.r2 = max(repository);
+    }
+
+    private String max(TransactionRepository repository) {
+        return repository.statisticsOfLast60Seconds().get("max").orNull();
     }
 
     @NotNull
