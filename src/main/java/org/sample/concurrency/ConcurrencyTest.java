@@ -44,15 +44,15 @@ class AverageConcurrencyTest {
 
     @Actor
     public void actor1(TransactionRepository repository, StringString_Result r) {
-        r.r1 = getString(repository);
+        r.r1 = addTransactionAndCalculateAvg(repository);
     }
 
     @Actor
     public void actor2(TransactionRepository repository, StringString_Result r) {
-        r.r2 = getString(repository);
+        r.r2 = addTransactionAndCalculateAvg(repository);
     }
 
-    private String getString(TransactionRepository repository) {
+    private String addTransactionAndCalculateAvg(TransactionRepository repository) {
         repository.addTransaction(getRequest());
         return repository.statisticsOfLast60Seconds().get("avg").orNull();
     }
