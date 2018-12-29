@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Result
-public class OptionOption_Result implements Serializable {
+public class StringString_Result implements Serializable {
     @sun.misc.Contended
     @jdk.internal.vm.annotation.Contended
     public String r1;
@@ -19,7 +19,7 @@ public class OptionOption_Result implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OptionOption_Result that = (OptionOption_Result) o;
+        StringString_Result that = (StringString_Result) o;
         return Objects.equals(r1, that.r1) &&
                 Objects.equals(r2, that.r2);
     }

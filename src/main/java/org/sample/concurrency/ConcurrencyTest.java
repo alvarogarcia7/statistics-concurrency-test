@@ -32,7 +32,7 @@ package org.sample.concurrency;
 
 import org.jetbrains.annotations.NotNull;
 import org.openjdk.jcstress.annotations.*;
-import org.sample.concurrency.harness.OptionOption_Result;
+import org.sample.concurrency.harness.StringString_Result;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -43,12 +43,12 @@ import java.time.ZonedDateTime;
 class AverageConcurrencyTest {
 
     @Actor
-    public void actor1(TransactionRepository repository, OptionOption_Result r) {
+    public void actor1(TransactionRepository repository, StringString_Result r) {
         r.r1 = getString(repository);
     }
 
     @Actor
-    public void actor2(TransactionRepository repository, OptionOption_Result r) {
+    public void actor2(TransactionRepository repository, StringString_Result r) {
         r.r2 = getString(repository);
     }
 
@@ -69,13 +69,13 @@ class AverageConcurrencyTest {
 class MaxConcurrencyTest {
 
     @Actor
-    public void actor1(TransactionRepository repository, OptionOption_Result r) {
+    public void actor1(TransactionRepository repository, StringString_Result r) {
         repository.addTransaction(getRequest("1"));
         r.r1 = repository.statisticsOfLast60Seconds().get("max").orNull();
     }
 
     @Actor
-    public void actor2(TransactionRepository repository, OptionOption_Result r) {
+    public void actor2(TransactionRepository repository, StringString_Result r) {
         repository.addTransaction(getRequest("2"));
         r.r2 = repository.statisticsOfLast60Seconds().get("max").orNull();
     }
