@@ -37,28 +37,51 @@ import org.sample.concurrency.harness.OptionOption_Result;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-// See jcstress-samples or existing tests for API introduction and testing guidelines
 
 @JCStressTest
-// Outline the outcomes here. The default outcome is provided, you need to remove it:
-@Outcome(id = "1.00, 1.00", expect = Expect.ACCEPTABLE, desc = "Default outcome.")
-public class ConcurrencyTest {
+@Outcome(id = "1.00, 1.00", expect = Expect.ACCEPTABLE)
+class AverageConcurrencyTest {
 
     @Actor
     public void actor1(TransactionRepository repository, OptionOption_Result r) {
-        repository.addTransaction(getRequest());
-        r.r1 = repository.statisticsOfLast60Seconds().get("avg").orNull();
+        r.r1 = getString(repository);
     }
 
     @Actor
     public void actor2(TransactionRepository repository, OptionOption_Result r) {
+        r.r2 = getString(repository);
+    }
+
+    private String getString(TransactionRepository repository) {
         repository.addTransaction(getRequest());
-        r.r2 = repository.statisticsOfLast60Seconds().get("avg").orNull();
+        return repository.statisticsOfLast60Seconds().get("avg").orNull();
     }
 
     @NotNull
     private Transaction getRequest() {
         return new Transaction(new BigDecimal("1"), ZonedDateTime.now());
     }
+}
 
+@JCStressTest
+@Outcome(id = "1.00, 2.00", expect = Expect.ACCEPTABLE, desc = "actor 1 writes before actor 2 reads")
+@Outcome(id = "2.00, 2.00", expect = Expect.ACCEPTABLE, desc = "actor 2 writes before actor 1 reads")
+class MaxConcurrencyTest {
+
+    @Actor
+    public void actor1(TransactionRepository repository, OptionOption_Result r) {
+        repository.addTransaction(getRequest("1"));
+        r.r1 = repository.statisticsOfLast60Seconds().get("max").orNull();
+    }
+
+    @Actor
+    public void actor2(TransactionRepository repository, OptionOption_Result r) {
+        repository.addTransaction(getRequest("2"));
+        r.r2 = repository.statisticsOfLast60Seconds().get("max").orNull();
+    }
+
+    @NotNull
+    private Transaction getRequest(String val) {
+        return new Transaction(new BigDecimal(val), ZonedDateTime.now());
+    }
 }
