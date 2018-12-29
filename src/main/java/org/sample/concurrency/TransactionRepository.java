@@ -8,19 +8,27 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 @State
 public class TransactionRepository {
-    private List<Transaction> values = new ArrayList<>();
+    private final List<Transaction> values = Collections.synchronizedList(new ArrayList<>());
 
     public void addTransaction(Transaction request) {
-        this.values.add(request);
+
+        synchronized (values) {
+            this.values.add(request);
+        }
     }
 
     public Statistics statisticsOfLast60Seconds() {
-        final List<Transaction> validValues = values.stream().filter(it -> !it.expired()).collect(Collectors.toList());
+        final List<Transaction> validValues;
+        synchronized (values) {
+            validValues = values.stream().filter(it -> !it.expired()).collect(Collectors.toList());
+        }
         final int size = validValues.size();
         int count = size;
         return Statistics.Companion.of(count,
@@ -91,6 +99,8 @@ public class TransactionRepository {
     }
 
     public void deleteAllTransactions() {
-        this.values.clear();
+        synchronized (values) {
+            this.values.clear();
+        }
     }
 }
