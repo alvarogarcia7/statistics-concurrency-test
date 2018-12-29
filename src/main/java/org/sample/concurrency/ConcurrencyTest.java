@@ -30,25 +30,35 @@
  */
 package org.sample.concurrency;
 
+import org.jetbrains.annotations.NotNull;
 import org.openjdk.jcstress.annotations.*;
-import org.openjdk.jcstress.infra.results.II_Result;
+import org.sample.concurrency.harness.OptionOption_Result;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 // See jcstress-samples or existing tests for API introduction and testing guidelines
 
 @JCStressTest
 // Outline the outcomes here. The default outcome is provided, you need to remove it:
-@Outcome(id = "0, 0", expect = Expect.ACCEPTABLE, desc = "Default outcome.")
-@State
+@Outcome(id = "1.00, 1.00", expect = Expect.ACCEPTABLE, desc = "Default outcome.")
 public class ConcurrencyTest {
 
     @Actor
-    public void actor1(II_Result r) {
-        // Put the code for first thread here
+    public void actor1(TransactionRepository repository, OptionOption_Result r) {
+        repository.addTransaction(getRequest());
+        r.r1 = repository.statisticsOfLast60Seconds().get("avg").orNull();
     }
 
     @Actor
-    public void actor2(II_Result r) {
-        // Put the code for second thread here
+    public void actor2(TransactionRepository repository, OptionOption_Result r) {
+        repository.addTransaction(getRequest());
+        r.r2 = repository.statisticsOfLast60Seconds().get("avg").orNull();
+    }
+
+    @NotNull
+    private Transaction getRequest() {
+        return new Transaction(new BigDecimal("1"), ZonedDateTime.now());
     }
 
 }
