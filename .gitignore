@@ -90,3 +90,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 target/
+
+## jcstress
+results/
+jcstress*bin.gz
