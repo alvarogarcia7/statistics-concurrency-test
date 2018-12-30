@@ -39,6 +39,35 @@ import java.time.ZonedDateTime;
 
 
 @JCStressTest
+@Outcome(id = "0.00, 0.00", expect = Expect.ACCEPTABLE)
+class ExpiredConcurrencyTest {
+
+    @Actor
+    public void actor1(TransactionRepository repository, StringString_Result r) {
+        r.r1 = addTransactionAndGet(repository);
+    }
+
+    @Actor
+    public void actor2(TransactionRepository repository, StringString_Result r) {
+        r.r2 = addTransactionAndGet(repository);
+    }
+
+    private String addTransactionAndGet(TransactionRepository repository) {
+        repository.addTransaction(getRequest());
+        return get(repository, "sum");
+    }
+
+    private String get(TransactionRepository repository, String key) {
+        return repository.statisticsOfLast60Seconds().get(key).orNull();
+    }
+
+    @NotNull
+    private Transaction getRequest() {
+        return new Transaction(new BigDecimal("1"), ZonedDateTime.now().minusMinutes(2));
+    }
+}
+
+@JCStressTest
 @Outcome(id = "1.00, 1.00", expect = Expect.ACCEPTABLE)
 class AverageConcurrencyTest {
 

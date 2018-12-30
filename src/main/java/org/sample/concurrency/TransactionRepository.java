@@ -10,8 +10,9 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.*;
 
 @State
 public class TransactionRepository {
@@ -29,20 +30,18 @@ public class TransactionRepository {
         synchronized (values) {
             validValues = values.stream().filter(it -> !it.expired()).collect(Collectors.toList());
         }
-        final int size = validValues.size();
-        int count = size;
-        return Statistics.Companion.of(count,
-                pair("sum", sum(validValues, BigDecimal.ZERO)),
-                pair("avg", avgOrDefault(validValues, BigDecimal.ZERO)),
-                pair("max", maxOrDefault(validValues, BigDecimal.ZERO)),
-                pair("min", minOrDefault(validValues, BigDecimal.ZERO)));
+        return Statistics.Companion.of(validValues.size(),
+                pair("sum", sumOrDefault(validValues, ZERO)),
+                pair("avg", avgOrDefault(validValues, ZERO)),
+                pair("max", maxOrDefault(validValues, ZERO)),
+                pair("min", minOrDefault(validValues, ZERO)));
     }
 
     private Pair<String, String> pair(String a, String b) {
         return new Pair<>(a, b);
     }
 
-    private String sum(List<Transaction> values, BigDecimal defaultValue) {
+    private String sumOrDefault(List<Transaction> values, BigDecimal defaultValue) {
         return formatted(sumAsBigDecimal(values, defaultValue));
     }
 
